@@ -530,321 +530,190 @@
             { text: "Energi naik, harga turun, senyum melengkung!", author: "Slogan Workshop" },
             { text: "Dibuat dengan presisi 100%, kayak percobaan fisika!", author: "Tim Quality Control" }
         ];
+    // ============================================
+    // FUNGSI UTILITY
+    // ============================================
+    function getCurrentDateTime() {
+        const now = new Date();
+        return now.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
 
-        // ============================================
-        // 3. FUNGSI UTILITY
-        // ============================================
-        function getCurrentDateTime() {
-            const now = new Date();
-            return now.toLocaleString('id-ID', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `fixed top-4 right-4 px-5 py-4 rounded-lg shadow-2xl z-50 max-w-md new-message ${
+            type === 'success' ? 'bg-green-900 border-l-4 border-green-500' :
+            type === 'error' ? 'bg-red-900 border-l-4 border-red-500' :
+            'bg-blue-900 border-l-4 border-blue-500'
+        }`;
+        alertDiv.innerHTML = `
+            <div class="flex items-center gap-3">
+                <i class="fas ${
+                    type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' :
+                    'fa-info-circle'
+                } text-xl text-white"></i>
+                <div class="text-white font-medium">${message}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.style.opacity = '0';
+            setTimeout(() => alertDiv.remove(), 500);
+        }, 5000);
+    }
 
-        function showAlert(message, type = 'info') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert-notification alert-${type}`;
-            alertDiv.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <i class="fas ${
-                        type === 'success' ? 'fa-check-circle' :
-                        type === 'error' ? 'fa-exclamation-circle' :
-                        type === 'warning' ? 'fa-exclamation-triangle' :
-                        'fa-info-circle'
-                    } text-xl text-white"></i>
-                    <div class="text-white font-medium">${message}</div>
-                </div>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                alertDiv.style.opacity = '0';
-                alertDiv.style.transition = 'opacity 0.5s';
-                setTimeout(() => alertDiv.remove(), 500);
-            }, 5000);
-        }
+    // ============================================
+    // FUNGSI ORDER OFFLINE
+    // ============================================
+    function orderOffline(productName) {
+        showAlert(`Silakan order "${productName}" langsung di stand TeknoBites di Lab Fisika! 🛒`, 'info');
+    }
 
-        // ============================================
-        // 4. FUNGSI ORDER OFFLINE
-        // ============================================
-        function orderOffline(productName) {
-            showAlert(`Silakan order "${productName}" langsung di stand TeknoBites di Lab Fisika! 🛒`, 'info');
+    // ============================================
+    // FITUR QUOTE GENERATOR
+    // ============================================
+    function generateNewQuote() {
+        const randomIndex = Math.floor(Math.random() * workshopQuotes.length);
+        const quote = workshopQuotes[randomIndex];
+        
+        const quoteElement = document.getElementById('workshop-quote');
+        const authorElement = document.getElementById('quote-author');
+        
+        quoteElement.style.opacity = '0.5';
+        authorElement.style.opacity = '0.5';
+        
+        setTimeout(() => {
+            quoteElement.textContent = `"${quote.text}"`;
+            authorElement.textContent = `— ${quote.author}`;
             
-            // Efek visual pada tombol
-            const buttons = document.querySelectorAll('.offline-btn');
-            buttons.forEach(btn => {
-                btn.classList.add('animate-pulse');
-                setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
-            });
-        }
+            quoteElement.style.opacity = '1';
+            authorElement.style.opacity = '1';
+        }, 300);
+    }
 
-        // ============================================
-        // 5. FITUR QUOTE GENERATOR
-        // ============================================
-        function generateNewQuote() {
-            const randomIndex = Math.floor(Math.random() * workshopQuotes.length);
-            const quote = workshopQuotes[randomIndex];
-            
-            const quoteElement = document.getElementById('workshop-quote');
-            const authorElement = document.getElementById('quote-author');
-            
-            quoteElement.style.opacity = '0.5';
-            authorElement.style.opacity = '0.5';
-            
-            setTimeout(() => {
-                quoteElement.textContent = `"${quote.text}"`;
-                authorElement.textContent = `— ${quote.author}`;
-                
-                quoteElement.style.opacity = '1';
-                authorElement.style.opacity = '1';
-                
-                quoteElement.classList.add('new-message');
-                setTimeout(() => {
-                    quoteElement.classList.remove('new-message');
-                }, 500);
-            }, 300);
-        }
+    // ============================================
+    // SISTEM PESAN & KESAN - SUSUNAN FIX
+    // ============================================
 
-        // ============================================
-        // 6. SISTEM PESAN & KESAN (GOOGLE SHEETS + LOCAL STORAGE)
-        // ============================================
-
-        // Fungsi untuk membuat HTML pesan
-        function createMessageHTML(nama, pesan, tanggal, isFromGoogle = false) {
-            const borderColor = isFromGoogle ? '#FFD700' : '#CC0000';
-            const icon = isFromGoogle ? 'fa-cloud' : 'fa-desktop';
-            const source = isFromGoogle ? '[GOOGLE SHEETS]' : '[LOCAL STORAGE]';
-            
-            return `
-                <div class="new-message mb-4">
-                    <div style="border-left: 3px solid ${borderColor}; padding-left: 12px; background: rgba(0,0,0,0.2);">
-                        <div class="flex justify-between items-start mb-1">
-                            <div>
-                                <span style="color: var(--warning-yellow); font-weight: bold; font-size: 15px;">
-                                    <i class="fas fa-user-circle mr-1"></i>${nama}
-                                </span>
-                                <span class="text-xs ml-2 px-2 py-1 bg-gray-800 rounded">
-                                    <i class="fas ${icon} mr-1"></i>${source}
-                                </span>
-                            </div>
-                            <span class="text-xs text-gray-400">
-                                <i class="fas fa-clock mr-1"></i>${tanggal}
+    // Fungsi untuk membuat HTML pesan dengan urutan yang benar
+    function createMessageHTML(nama, pesan, tanggal) {
+        return `
+            <div class="new-message mb-4">
+                <div style="border-left: 3px solid #FFD700; padding-left: 12px; background: rgba(0,0,0,0.2);">
+                    <div class="flex justify-between items-start mb-1">
+                        <div>
+                            <span style="color: var(--warning-yellow); font-weight: bold; font-size: 15px;">
+                                <i class="fas fa-user-circle mr-1"></i>${nama}
+                            </span>
+                            <span class="text-xs ml-2 px-2 py-1 bg-green-900 rounded">
+                                <i class="fas fa-cloud mr-1"></i>GOOGLE SHEETS
                             </span>
                         </div>
-                        <div style="color: white; font-size: 14px; line-height: 1.4; padding-left: 5px; margin-top: 5px;">
-                            ${pesan}
-                        </div>
+                        <span class="text-xs text-gray-400">
+                            <i class="fas fa-clock mr-1"></i>${tanggal}
+                        </span>
+                    </div>
+                    <div style="color: white; font-size: 14px; line-height: 1.4; padding-left: 5px; margin-top: 5px;">
+                        ${pesan}
                     </div>
                 </div>
-            `;
-        }
+            </div>
+        `;
+    }
 
-        // Simpan ke Local Storage
-        function saveToLocalStorage(nama, pesan, tanggal) {
-            try {
-                let messages = JSON.parse(localStorage.getItem('tekno_messages') || '[]');
-                
-                const newMessage = {
-                    id: Date.now(),
-                    nama: nama,
-                    pesan: pesan,
-                    tanggal: tanggal,
-                    source: 'local'
-                };
-                
-                messages.unshift(newMessage);
-                
-                // Maksimal 50 pesan
-                if (messages.length > 50) {
-                    messages = messages.slice(0, 50);
-                }
-                
-                localStorage.setItem('tekno_messages', JSON.stringify(messages));
-                return true;
-            } catch (error) {
-                console.error('Local Storage error:', error);
-                return false;
-            }
+    // KIRIM KE GOOGLE SHEETS dengan urutan yang benar
+    async function kirimPesanGoogleSheets() {
+        const nama = document.getElementById('username').value.trim();
+        const pesan = document.getElementById('usermsg').value.trim();
+        const submitBtn = document.getElementById('submit-btn');
+        const statusDiv = document.getElementById('form-status');
+        
+        // Validasi
+        if (!nama || !pesan) {
+            showAlert('❌ Nama dan pesan harus diisi!', 'error');
+            return;
         }
-
-        // Load dari Local Storage
-        function loadFromLocalStorage() {
-            try {
-                const messages = JSON.parse(localStorage.getItem('tekno_messages') || '[]');
-                const display = document.getElementById('chat-display');
-                const messageCountElement = document.getElementById('message-count');
-                
-                if (messages.length === 0) {
-                    // Tampilkan pesan default jika kosong
-                    display.innerHTML = `
-                        <div class="text-center text-gray-500 py-10">
-                            <i class="fas fa-comment-slash text-3xl mb-3"></i><br>
-                            <span class="font-bold">Belum ada pesan</span><br>
-                            <span class="text-sm">Jadilah yang pertama memberikan pesan & kesan!</span>
-                        </div>
-                    `;
-                    messageCountElement.textContent = '0 pesan tersimpan';
-                } else {
-                    // Tampilkan pesan dari Local Storage
-                    display.innerHTML = '';
-                    messages.forEach(msg => {
-                        display.innerHTML += createMessageHTML(msg.nama, msg.pesan, msg.tanggal, msg.source === 'google');
-                    });
-                    messageCountElement.textContent = `${messages.length} pesan tersimpan`;
-                }
-                
-                return messages.length;
-            } catch (error) {
-                console.error('Error loading from Local Storage:', error);
-                return 0;
-            }
-        }
-
-        // Coba load dari Google Sheets
-        async function tryLoadFromGoogleSheets() {
-            try {
-                console.log('Mencoba koneksi ke Google Sheets...');
-                const response = await fetch(`${GOOGLE_SHEET_URL}?action=getMessages&timestamp=${Date.now()}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Data dari Google Sheets:', data);
-                    
-                    if (data && Array.isArray(data) && data.length > 0) {
-                        const connectionStatus = document.getElementById('connection-status');
-                        connectionStatus.innerHTML = '<i class="fas fa-cloud text-green-400 mr-1"></i> GOOGLE SHEETS';
-                        return true;
-                    }
-                }
-                return false;
-            } catch (error) {
-                console.log('Google Sheets offline, menggunakan Local Storage');
-                return false;
-            }
-        }
-
-        // Kirim ke Google Sheets (DIPERBAIKI)
-        async function kirimPesanGoogleSheets() {
-            const nama = document.getElementById('username').value.trim();
-            const pesan = document.getElementById('usermsg').value.trim();
-            const submitBtn = document.getElementById('submit-btn');
-            const statusDiv = document.getElementById('form-status');
+        
+        // Tampilkan loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> MENGIRIM...';
+        statusDiv.classList.remove('hidden');
+        
+        const tanggal = getCurrentDateTime();
+        
+        try {
+            // Kirim data dengan URUTAN YANG BENAR: Nama, Pesan, Tanggal
+            const formData = new URLSearchParams();
+            formData.append('Nama', nama);      // Kolom A di Google Sheets
+            formData.append('Pesan', pesan);    // Kolom B di Google Sheets
+            formData.append('Tanggal', tanggal); // Kolom C di Google Sheets
             
-            // Validasi input
-            if (!nama || !pesan) {
-                showAlert('❌ Nama dan pesan harus diisi!', 'error');
-                return;
-            }
+            console.log('📤 Mengirim data:', { nama, pesan, tanggal });
             
-            if (nama.length > 30) {
-                showAlert('❌ Nama maksimal 30 karakter!', 'error');
-                return;
-            }
+            // Kirim ke Google Sheets
+            const response = await fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData
+            });
             
-            if (pesan.length > 300) {
-                showAlert('❌ Pesan maksimal 300 karakter!', 'error');
-                return;
-            }
+            // Reset form
+            document.getElementById('username').value = '';
+            document.getElementById('usermsg').value = '';
             
-            // Tampilkan loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> MENGIRIM...';
-            statusDiv.classList.remove('hidden');
+            // Tampilkan sukses
+            showAlert('✅ Pesan berhasil dikirim!', 'success');
             
-            const tanggal = getCurrentDateTime();
+            // Tampilkan pesan langsung di chat
             const display = document.getElementById('chat-display');
             
-            try {
-                // 1. SIMPAN KE LOCAL STORAGE DULU (garansi pasti tersimpan)
-                saveToLocalStorage(nama, pesan, tanggal);
-                
-                // 2. COBA KIRIM KE GOOGLE SHEETS
-                const formData = new URLSearchParams();
-                formData.append('Nama', nama);
-                formData.append('Pesan', pesan);
-                formData.append('Tanggal', tanggal);
-                
-                console.log('Mengirim data ke Google Sheets:', { nama, pesan, tanggal });
-                
-                // Method 1: Coba dengan POST biasa
-                try {
-                    const response = await fetch(GOOGLE_SHEET_URL, {
-                        method: 'POST',
-                        mode: 'no-cors', // Gunakan no-cors untuk menghindari CORS issues
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: formData
-                    });
-                    
-                    // Dengan no-cors, kita tidak bisa membaca response, tapi data tetap terkirim
-                    console.log('Data terkirim (no-cors mode)');
-                    
-                    // Update status koneksi
-                    const connectionStatus = document.getElementById('connection-status');
-                    connectionStatus.innerHTML = '<i class="fas fa-cloud text-green-400 mr-1"></i> GOOGLE SHEETS';
-                    
-                    showAlert('✅ Pesan berhasil dikirim ke Google Sheets!', 'success');
-                    
-                } catch (postError) {
-                    console.log('POST dengan no-cors gagal, coba method lain');
-                    
-                    // Method 2: Coba dengan GET (fallback)
-                    try {
-                        const getUrl = `${GOOGLE_SHEET_URL}?Nama=${encodeURIComponent(nama)}&Pesan=${encodeURIComponent(pesan)}&Tanggal=${encodeURIComponent(tanggal)}&method=GET`;
-                        await fetch(getUrl, { mode: 'no-cors' });
-                        console.log('Data terkirim via GET (fallback)');
-                        
-                        showAlert('✅ Pesan berhasil dikirim!', 'success');
-                    } catch (getError) {
-                        console.log('Kedua method gagal, hanya simpan lokal');
-                        showAlert('⚠️ Data disimpan lokal. Google Sheets offline.', 'warning');
-                    }
-                }
-                
-                // 3. TAMPILKAN PESAN BARU DI CHAT
-                // Jika chat masih loading, clear dulu
-                if (display.innerHTML.includes('Memuat pesan')) {
-                    display.innerHTML = '';
-                }
-                
-                // Tambah pesan baru di atas
-                const newMessageHTML = createMessageHTML(nama, pesan, tanggal, true);
-                display.innerHTML = newMessageHTML + display.innerHTML;
-                
-                // 4. UPDATE COUNTER
-                const messageCount = display.querySelectorAll('.new-message').length;
-                document.getElementById('message-count').textContent = `${messageCount} pesan ditampilkan`;
-                
-                // 5. RESET FORM
-                document.getElementById('username').value = '';
-                document.getElementById('usermsg').value = '';
-                
-            } catch (error) {
-                console.error('Error utama:', error);
-                showAlert('❌ Terjadi kesalahan sistem. Data disimpan lokal.', 'error');
-                
-                // Tetap tampilkan pesan dari Local Storage
-                loadFromLocalStorage();
-            } finally {
-                // Reset button
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> [ EXECUTE ] KIRIM KE GOOGLE SHEETS';
-                statusDiv.classList.add('hidden');
+            // Jika chat masih loading, clear dulu
+            if (display.innerHTML.includes('Memuat pesan')) {
+                display.innerHTML = '';
             }
+            
+            // Tambah pesan baru di atas
+            display.innerHTML = createMessageHTML(nama, pesan, tanggal) + display.innerHTML;
+            
+            // Update counter
+            const messageCount = display.querySelectorAll('.new-message').length;
+            document.getElementById('message-count').textContent = `${messageCount} pesan`;
+            
+            // Auto refresh semua pesan setelah 3 detik
+            setTimeout(() => {
+                loadMessagesFromGoogleSheets();
+            }, 3000);
+            
+        } catch (error) {
+            console.error('❌ Error mengirim:', error);
+            showAlert('⚠️ Gagal mengirim. Coba lagi nanti.', 'error');
+        } finally {
+            // Reset button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> [ EXECUTE ] KIRIM KE GOOGLE SHEETS';
+            statusDiv.classList.add('hidden');
         }
+    }
 
-        // Refresh messages
-        function refreshMessages() {
-            showAlert('🔄 Memuat ulang pesan...', 'info');
+    // LOAD PESAN DARI GOOGLE SHEETS dengan parsing yang benar
+    async function loadMessagesFromGoogleSheets() {
+        try {
+            const display = document.getElementById('chat-display');
+            const messageCountElement = document.getElementById('message-count');
+            const connectionStatus = document.getElementById('connection-status');
             
             // Tampilkan loading
-            const display = document.getElementById('chat-display');
             display.innerHTML = `
                 <div class="text-center text-gray-500 py-10">
                     <div class="loading-spinner mx-auto mb-3"></div>
@@ -852,70 +721,137 @@
                 </div>
             `;
             
-            // Coba koneksi ke Google Sheets
-            setTimeout(async () => {
-                const googleConnected = await tryLoadFromGoogleSheets();
+            // Ambil data dari Google Sheets
+            const response = await fetch(`${GOOGLE_SHEET_URL}?action=getMessages`);
+            
+            if (response.ok) {
+                const data = await response.json();
                 
-                // Load dari Local Storage (utama)
-                loadFromLocalStorage();
+                // Update status
+                connectionStatus.innerHTML = '<i class="fas fa-cloud text-green-400 mr-1"></i> GOOGLE SHEETS';
                 
-                if (googleConnected) {
-                    showAlert('✅ Terhubung ke Google Sheets', 'success');
+                if (data && Array.isArray(data) && data.length > 0) {
+                    // Kosongkan display
+                    display.innerHTML = '';
+                    
+                    // BALIK URUTAN agar yang terbaru di atas
+                    data.reverse().forEach(row => {
+                        // PARSE DATA DENGAN URUTAN YANG BENAR:
+                        // row[0] = Nama (Kolom A)
+                        // row[1] = Pesan (Kolom B)
+                        // row[2] = Tanggal (Kolom C)
+                        
+                        const nama = row[0] || 'Anonim';
+                        const pesan = row[1] || '';
+                        const tanggal = row[2] || getCurrentDateTime();
+                        
+                        display.innerHTML += createMessageHTML(nama, pesan, tanggal);
+                    });
+                    
+                    // Update counter
+                    messageCountElement.textContent = `${data.length} pesan`;
+                    
+                    // Scroll ke atas
+                    setTimeout(() => {
+                        display.scrollTop = 0;
+                    }, 100);
+                    
+                } else {
+                    // Jika tidak ada data
+                    display.innerHTML = `
+                        <div class="text-center text-gray-500 py-10">
+                            <i class="fas fa-comments text-3xl mb-3"></i><br>
+                            <span class="font-bold">Belum ada pesan</span><br>
+                            <span class="text-sm">Jadilah yang pertama!</span>
+                        </div>
+                    `;
+                    messageCountElement.textContent = '0 pesan';
                 }
-            }, 1000);
-        }
-
-        // Hapus semua pesan
-        function clearAllMessages() {
-            if (confirm('Yakin hapus semua pesan dari penyimpanan lokal?')) {
-                localStorage.removeItem('tekno_messages');
-                loadFromLocalStorage();
-                showAlert('🗑️ Semua pesan lokal telah dihapus!', 'success');
+                
+            } else {
+                throw new Error('Gagal mengambil data');
             }
+            
+        } catch (error) {
+            console.error('❌ Error loading messages:', error);
+            
+            // Tampilkan error message
+            const display = document.getElementById('chat-display');
+            display.innerHTML = `
+                <div class="text-center text-gray-500 py-10">
+                    <i class="fas fa-exclamation-triangle text-3xl mb-3 text-yellow-500"></i><br>
+                    <span class="font-bold">Tidak bisa memuat pesan</span><br>
+                    <span class="text-sm">Refresh halaman atau coba lagi nanti</span>
+                </div>
+            `;
+            
+            const connectionStatus = document.getElementById('connection-status');
+            connectionStatus.innerHTML = '<i class="fas fa-wifi-slash text-yellow-400 mr-1"></i> OFFLINE';
         }
+    }
 
-        // ============================================
-        // 7. INISIALISASI SAAT HALAMAN DIMUAT
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // 1. Generate quote pertama
-            generateNewQuote();
-            
-            // 2. Auto change quote setiap 30 detik
-            setInterval(generateNewQuote, 30000);
-            
-            // 3. Load pesan saat pertama kali
-            refreshMessages();
-            
-            // 4. Auto refresh pesan setiap 60 detik
-            setInterval(refreshMessages, 60000);
-            
-            // 5. Cek koneksi Google Sheets
-            setTimeout(async () => {
-                const connected = await tryLoadFromGoogleSheets();
-                if (!connected) {
-                    const connectionStatus = document.getElementById('connection-status');
-                    connectionStatus.innerHTML = '<i class="fas fa-desktop text-yellow-400 mr-1"></i> LOCAL STORAGE';
-                    showAlert('⚠️ Menggunakan penyimpanan lokal', 'warning');
-                }
-            }, 2000);
-            
-            console.log('TeknoBites Workshop Loaded Successfully! ✅');
-        });
+    // REFRESH PESAN
+    function refreshMessages() {
+        showAlert('🔄 Memuat ulang pesan...', 'info');
+        loadMessagesFromGoogleSheets();
+    }
 
-        // ============================================
-        // 8. ANIMASI MARQUEE
-        // ============================================
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes marquee {
-                0% { transform: translateX(100%); }
-                100% { transform: translateX(-100%); }
-            }
-        `;
-        document.head.appendChild(style);
+    // HAPUS PESAN LOKAL (jika ada)
+    function clearAllMessages() {
+        if (confirm('Hapus semua pesan dari tampilan?')) {
+            const display = document.getElementById('chat-display');
+            display.innerHTML = `
+                <div class="text-center text-gray-500 py-10">
+                    <i class="fas fa-check-circle text-3xl mb-3 text-green-500"></i><br>
+                    <span class="font-bold">Pesan dihapus dari tampilan</span><br>
+                    <span class="text-sm">Refresh untuk melihat pesan dari Google Sheets</span>
+                </div>
+            `;
+            showAlert('🗑️ Tampilan pesan dihapus', 'info');
+        }
+    }
 
-// ============================================
+    // ============================================
+    // INISIALISASI
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Generate quote pertama
+        generateNewQuote();
+        
+        // 2. Auto change quote setiap 30 detik
+        setInterval(generateNewQuote, 30000);
+        
+        // 3. Load pesan saat pertama kali
+        loadMessagesFromGoogleSheets();
+        
+        // 4. AUTO-REFRESH PESAN SETIAP 20 DETIK
+        setInterval(loadMessagesFromGoogleSheets, 20000);
+        
+        console.log('✅ TeknoBites Workshop Loaded!');
+    });
+
+    // ============================================
+    // ANIMASI MARQUEE
+    // ============================================
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+    `;
+    document.head.appendChild(style);
+        // Kode Google Apps Script yang benar:
+function doPost(e) {
+  // Ambil data dengan urutan: Nama, Pesan, Tanggal
+  const nama = e.parameter.Nama;
+  const pesan = e.parameter.Pesan;
+  const tanggal = e.parameter.Tanggal;
+  
+  // Simpan ke Google Sheets dengan urutan: Kolom A = Nama, B = Pesan, C = Tanggal
+  sheet.appendRow([nama, pesan, tanggal, new Date()]);
+}
+        // ============================================
 // 9. AUTO-REFRESH PESAN DARI GOOGLE SHEETS
 // ============================================
 
@@ -943,9 +879,9 @@ async function loadMessagesFromGoogleSheets() {
                 // Balik urutan agar yang terbaru di atas
                 data.reverse().forEach((row, index) => {
                     if (row.length >= 3) {
-                        const nama = row[1] || 'Anonim';
-                        const pesan = row[2] || '';
-                        const tanggal = row[3] || getCurrentDateTime();
+                        const nama = row[0] || 'Anonim';
+                        const pesan = row[1] || '';
+                        const tanggal = row[2] || getCurrentDateTime();
                         
                         // Tambah kelas animasi untuk pesan baru (5 pesan pertama)
                         const isNew = index < 5;
@@ -1018,8 +954,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. Load pesan saat pertama kali (dari Google Sheets)
     syncAllMessages();
     
-    // 4. AUTO-REFRESH PESAN SETIAP 30 detik (INI YANG PENTING!)
-    setInterval(syncAllMessages, 30000); // Refresh setiap 60 detik
+    // 4. AUTO-REFRESH PESAN SETIAP 30 DETIK (INI YANG PENTING!)
+    setInterval(syncAllMessages, 30000); // Refresh setiap 30 detik
     
     // 5. Auto refresh pesan setiap 60 detik juga
     setInterval(syncAllMessages, 60000);
@@ -1030,4 +966,5 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
+
 

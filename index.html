@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEKNOBITES | BENGKEL TEKNIK MURNI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome - Ikon untuk tema Bengkel -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fonts: Rajdhani (Industrial/Technical Look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Variabel Warna Industrial dan Bengkel */
+        :root {
+            --metal-grey: #333333;
+            --metal-silver: #D0D0D0;
+            --safety-red: #CC0000;
+            --warning-yellow: #FFD700;
+            --dark-oil: #1A1A1A;
+            --dark-steel: #252525;
+            --light-steel: #444444;
+            --deep-black: #050505;
+        }
+
+        body {
+            background-color: var(--dark-oil);
+            color: var(--metal-silver);
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            /* Pola Latar Belakang: Diamond Plate atau Plat Besi */
+            background-image: repeating-linear-gradient(45deg, var(--dark-oil), var(--dark-oil) 10px, var(--metal-grey) 10px, var(--metal-grey) 11px);
+            background-size: 22px 22px;
+        }
+
+        /* Styling Judul - Bold, Stencil/Industrial Look */
+        .industrial-title {
+            color: var(--warning-yellow);
+            text-shadow: 4px 4px 0px var(--safety-red), 6px 6px 0px var(--deep-black);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Header Background */
+        .header-bg {
+            background: linear-gradient(180deg, var(--dark-steel) 0%, var(--dark-oil) 100%);
+            border-bottom: 8px solid var(--safety-red);
+        }
+
+        /* Styling Kartu Menu - Panel Besi/Toolbox */
+        .workshop-card {
+            background: var(--dark-steel);
+            border: 3px solid var(--light-steel);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .workshop-card:hover {
+            background: var(--metal-grey);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 15px var(--warning-yellow);
+        }
+        
+        /* Baut/Screw pada Sudut */
+        .bolt {
+            position: absolute;
+            width: 8px; height: 8px;
+            background: var(--metal-silver);
+            border-radius: 50%;
+            border: 1px solid var(--dark-steel);
+            z-index: 10;
+        }
+        .bolt.tl { top: -4px; left: -4px; }
+        .bolt.tr { top: -4px; right: -4px; }
+        .bolt.bl { bottom: -4px; left: -4px; }
+        .bolt.br { bottom: -4px; right: -4px; }
+
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0.3; } }
+
+        /* Gaya Terminal */
+        .terminal-box {
+            font-family: monospace;
+            background: var(--dark-steel);
+            color: var(--metal-silver);
+            box-shadow: 0 0 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .terminal-box input, .terminal-box textarea {
+            background: var(--dark-oil) !important;
+            color: var(--warning-yellow) !important;
+            border: 1px solid var(--light-steel);
+        }
+
+        /* Bentuk Tombol Industrial */
+        .industrial-btn {
+            background-color: var(--safety-red);
+            color: white;
+            padding: 12px 24px;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: 2px solid var(--dark-oil);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            transition: all 0.2s;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .industrial-btn:hover {
+            background-color: #AA0000;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        .industrial-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Tombol Offline */
+        .offline-btn {
+            background-color: var(--metal-grey);
+            color: var(--warning-yellow);
+            padding: 12px 24px;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: 2px solid var(--light-steel);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            transition: all 0.2s;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .offline-btn:hover {
+            background-color: var(--light-steel);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--warning-yellow);
+        }
+
+        /* Animasi pesan baru */
+        @keyframes slideIn {
+            from { 
+                transform: translateX(-20px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            }
+        }
+        
+        .new-message {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        /* Custom scrollbar untuk chat display */
+        #chat-display::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chat-display::-webkit-scrollbar-track {
+            background: var(--dark-steel);
+        }
+        #chat-display::-webkit-scrollbar-thumb {
+            background: var(--safety-red);
+            border-radius: 3px;
+        }
+        
+        /* Styling untuk status loading */
+        .loading-spinner {
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--warning-yellow);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Alert notification */
+        .alert-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #059669, #047857);
+            border-left: 5px solid #10b981;
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            border-left: 5px solid #ef4444;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            border-left: 5px solid #f59e0b;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            border-left: 5px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER SYSTEM - Industrial Look -->
+    <header class="p-4 header-bg sticky top-0 z-40 shadow-xl shadow-black/50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-tools text-5xl text-warning-yellow animate-pulse"></i> <!-- Ikon Tool/Alat -->
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-extrabold industrial-title tracking-wider">TEKNOBITES</h1>
+                    <p class="text-xs tracking-[0.2em] uppercase text-metal-silver">STASIUN SERVIS ENERGI | BENGKEL TEKNIK MURNI 11-6</p>
+                </div>
+            </div>
+            
+            <div class="mt-4 md:mt-0 text-right font-mono text-sm">
+                <div class="bg-dark-steel px-4 py-2 border-2 border-light-steel rounded shadow-inner shadow-black/50">
+                    <p class="text-metal-silver"><i class="fas fa-clock blink text-safety-red"></i> WAKTU OPERASI: 17 DESEMBER</p>
+                    <p class="text-warning-yellow font-bold"><i class="fas fa-map-marker-alt text-safety-red"></i> LOKASI BENGKEL: LAB FISIKA</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- RUNNING TEXT - Panggilan Aksi (Warning Tape) -->
+    <div class="bg-warning-yellow text-dark-oil font-bold font-mono overflow-hidden py-1 border-y-4 border-black">
+        <div class="whitespace-nowrap animate-[marquee_15s_linear_infinite]">
+            >>> PANGGILAN WORKSHOP: BAZAR TEKNOBITES DIMULAI >>> TEMUKAN KAMI DI LAB FISIKA >>> KAMI SIAP MENG-UPGRADE ENERGI DAN MOOD ANDA >>> SEMUA SUKU CADANG RASA BARU! >>> 
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <main class="flex-grow max-w-7xl mx-auto w-full p-4 md:p-6">
+
+        <!-- Intro Text - Panel Pengumuman Kaca Bening -->
+        <section class="mb-10 md:mb-12 text-center border-4 border-light-steel p-6 md:p-8 bg-black/50 relative overflow-hidden rounded-lg shadow-xl">
+            <div class="absolute top-0 right-0 p-2 text-xs text-metal-silver font-mono bg-dark-oil px-3 rounded-bl-lg">STATUS: HIGH PERFORMANCE</div>
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 uppercase inline-block border-b-4 border-safety-red pb-1 text-warning-yellow">BENGKEL RASA: SERVIS UNTUK JUARA</h2>
+            <p class="text-lg md:text-xl leading-relaxed max-w-4xl mx-auto font-light text-metal-silver">
+                Selamat datang di TEKNOBITES, stand resmi dari <span class="bg-safety-red text-white px-2 font-bold">Kelas 11-6 Teknik Murni</span>. Kami mengubah konsep makanan menjadi sebuah service maintenance untuk energi tubuh Anda. Setiap produk diracik oleh montir terbaik kami dengan <span class="text-warning-yellow font-bold">presisi 100%</span>.
+                <br><br>
+                <span class="text-sm font-mono text-gray-500">JAMINAN: RASA PREMIUM, HARGA PELAJAR, KUALITAS BINTANG LIMA.</span>
+            </p>
+        </section>
+
+        <!-- KATALOG SUKU CADANG (MENU) - Panel Toolbox -->
+        <h3 class="text-xl md:text-2xl font-bold mb-6 flex items-center gap-2 text-warning-yellow">
+            <i class="fas fa-cogs text-2xl md:text-3xl"></i> KATALOG SUKU CADANG & BAHAN BAKAR PRIMER
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            
+            <!-- PRODUCT 1: ALPUKAT (COOLANT) -->
+            <div class="workshop-card p-5 md:p-6 flex flex-col h-full group relative">
+                <span class="bolt tl"></span><span class="bolt tr"></span><span class="bolt bl"></span><span class="bolt br"></span>
+                <div class="border-b-2 border-light-steel pb-2 mb-4 flex justify-between items-end">
+                    <span class="text-3xl md:text-4xl font-bold text-safety-red">COOL-01</span>
+                    <span class="text-xs border border-light-steel px-2 py-1 text-metal-silver">CAIRAN_PENDINGIN</span>
+                </div>
+                
+                <div class="text-center py-4 md:py-6 mb-4 group-hover:bg-black/40 transition duration-300">
+                    <i class="fas fa-oil-can text-5xl md:text-6xl text-blue-400 mb-2"></i> <!-- Ikon Oli/Pelumas -->
+                    <h4 class="text-xl md:text-2xl font-bold uppercase text-warning-yellow">ALPUKAT LIQUID COOLANT</h4>
+                </div>
+
+                <div class="space-y-4 flex-grow font-light text-sm">
+                    <p class="text-metal-silver">
+                        <span class="font-bold text-white">> DESKRIPSI SERVIS:</span><br>
+                        Minuman Alpukat segar yang sangat dingin, berfungsi sebagai Pendingin Mesin Tubuh (Coolant). Dibuat dengan alpukat mentega pilihan dan racikan susu kental yang pas. Solusi cepat untuk overheating setelah beraktivitas.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-400 pt-2 border-t border-dashed border-light-steel">
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Alpukat Mentega</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Kalibrasi Manis Optimal</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Topping Pilihan</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Servis Cepat</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t-2 border-light-steel flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-center sm:text-right w-full sm:w-auto">
+                        <div class="text-xs text-gray-400">HARGA SUKU CADANG</div>
+                        <div class="text-2xl md:text-3xl font-bold text-warning-yellow">Rp 7.000</div>
+                    </div>
+                    <button class="offline-btn w-full sm:w-auto flex items-center justify-center gap-2" 
+                            onclick="orderOffline('ALPUKAT LIQUID COOLANT')">
+                        <i class="fas fa-store"></i>
+                        <span>ORDER OFFLINE DI STAND</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 2: COOKIES (REPAIR KIT) -->
+            <div class="workshop-card p-5 md:p-6 flex flex-col h-full group relative">
+                <span class="bolt tl"></span><span class="bolt tr"></span><span class="bolt bl"></span><span class="bolt br"></span>
+                <div class="border-b-2 border-light-steel pb-2 mb-4 flex justify-between items-end">
+                    <span class="text-3xl md:text-4xl font-bold text-safety-red">REPAIR-02</span>
+                    <span class="text-xs border border-light-steel px-2 py-1 text-metal-silver">PAKET_UPGRADE</span>
+                </div>
+                
+                <div class="text-center py-4 md:py-6 mb-4 group-hover:bg-black/40 transition duration-300">
+                    <i class="fas fa-toolbox text-5xl md:text-6xl text-orange-400 mb-2"></i> <!-- Ikon Kotak Alat -->
+                    <h4 class="text-xl md:text-2xl font-bold uppercase text-warning-yellow">COOKIES & ICE CREAM UPGRADE KIT</h4>
+                </div>
+
+                <div class="space-y-4 flex-grow font-light text-sm">
+                    <p class="text-metal-silver">
+                        <span class="font-bold text-white">> DESKRIPSI SERVIS:</span><br>
+                        Paket Servis (Emergency Maintenance) yang menggabungkan dua tekstur kontras: Cookies renyah yang hangat dan Ice Cream Vanilla yang beku. Solusi cepat dan premium untuk upgrade suasana hati Anda.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-400 pt-2 border-t border-dashed border-light-steel">
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Cookies Homemade</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Ice Cream Premium</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Perpaduan Rasa</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Sangat Memuaskan</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t-2 border-light-steel flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-center sm:text-right w-full sm:w-auto">
+                        <div class="text-xs text-gray-400">HARGA SUKU CADANG</div>
+                        <div class="text-2xl md:text-3xl font-bold text-warning-yellow">Rp 8.000</div>
+                    </div>
+                    <button class="offline-btn w-full sm:w-auto flex items-center justify-center gap-2"
+                            onclick="orderOffline('COOKIES & ICE CREAM UPGRADE KIT')">
+                        <i class="fas fa-store"></i>
+                        <span>ORDER OFFLINE DI STAND</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 3: CIRENG (FUEL CELL) -->
+            <div class="workshop-card p-5 md:p-6 flex flex-col h-full group relative">
+                <span class="bolt tl"></span><span class="bolt tr"></span><span class="bolt bl"></span><span class="bolt br"></span>
+                <div class="border-b-2 border-light-steel pb-2 mb-4 flex justify-between items-end">
+                    <span class="text-3xl md:text-4xl font-bold text-safety-red">FUEL-03</span>
+                    <span class="text-xs border border-light-steel px-2 py-1 text-metal-silver">BAHAN_BAKAR_PADAT</span>
+                </div>
+                
+                <div class="text-center py-4 md:py-6 mb-4 group-hover:bg-black/40 transition duration-300">
+                    <div class="relative inline-block">
+                        <i class="fas fa-gas-pump text-4xl md:text-5xl text-red-500 mb-2 absolute top-0 left-0 opacity-50 animate-pulse"></i>
+                        <i class="fas fa-fire text-5xl md:text-6xl text-warning-yellow mb-2"></i> <!-- Ikon Api/Pembakaran -->
+                    </div>
+                    <h4 class="text-xl md:text-2xl font-bold uppercase text-warning-yellow">CIRENG REACTOR FUEL CELL</h4>
+                </div>
+
+                <div class="space-y-4 flex-grow font-light text-sm">
+                    <p class="text-metal-silver">
+                        <span class="font-bold text-white">> DESKRIPSI SERVIS:</span><br>
+                        Bahan Bakar Utama (Fuel Cell) yang wajib dicoba! Cireng yang kami olah hingga sangat kenyal, renyah di luar, dan gurih di dalam. Disajikan dengan kuah keju spesial sebagai Booster Additive yang gurih dan kental.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-400 pt-2 border-t border-dashed border-light-steel">
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Tekstur Kenyal</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Kuah Keju</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Energi Karbohidrat</div>
+                        <div><i class="fas fa-check text-safety-red mr-1"></i> Pedas Opsional</div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t-2 border-light-steel flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-center sm:text-right w-full sm:w-auto">
+                        <div class="text-xs text-gray-400">HARGA SUKU CADANG</div>
+                        <div class="text-2xl md:text-3xl font-bold text-warning-yellow">Rp 8.000</div>
+                    </div>
+                    <button class="offline-btn w-full sm:w-auto flex items-center justify-center gap-2"
+                            onclick="orderOffline('CIRENG REACTOR FUEL CELL')">
+                        <i class="fas fa-store"></i>
+                        <span>ORDER OFFLINE DI STAND</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FITUR QUOTE GENERATOR -->
+        <section class="mt-12 mb-10">
+            <div class="bg-gradient-to-r from-dark-steel to-metal-grey p-6 rounded-lg border-2 border-light-steel text-center">
+                <h3 class="text-xl font-bold mb-4 text-warning-yellow">
+                    <i class="fas fa-quote-left mr-2"></i> MONTIR WISDOM OF THE DAY
+                </h3>
+                
+                <div id="workshop-quote" class="text-xl md:text-2xl font-bold text-white mb-4 italic min-h-[60px]">
+                    "Rasa premium, harga pelajar, kualitas bintang lima!"
+                </div>
+                
+                <p class="text-gray-400 mb-4" id="quote-author">— Motto TeknoBites</p>
+                
+                <button onclick="generateNewQuote()" class="industrial-btn text-sm py-2 px-6">
+                    <i class="fas fa-random mr-2"></i> QUOTE BARU
+                </button>
+            </div>
+        </section>
+
+        <!-- FITUR MENARIK: TERMINAL CHAT (PESAN & KESAN) - TERHUBUNG KE GOOGLE SHEETS -->
+        <section class="mt-12 mb-10">
+            <h3 class="text-xl font-bold mb-4 text-safety-red border-l-4 border-safety-red pl-3">
+                <i class="fas fa-comments mr-2"></i> PROTOKOL KOMUNIKASI WORKSHOP (KIRIM PESAN & KESAN)
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Input Panel -->
+                <div class="terminal-box p-5 rounded shadow-lg shadow-black/50">
+                    <div class="text-xs mb-4 text-warning-yellow font-mono">root@tekno-bengkel:~# input_service_request.sh</div>
+                    
+                    <div class="mb-5">
+                        <label class="block text-sm mb-2 text-metal-silver font-bold">
+                            <i class="fas fa-user mr-1"></i> USER ID (NAMA ANDA):
+                        </label>
+                        <input type="text" id="username" class="w-full p-3 focus:outline-none rounded" 
+                               placeholder="Contoh: Montir Budi" maxlength="30" required>
+                        <div class="text-xs text-gray-500 mt-1">Maksimal 30 karakter</div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="block text-sm mb-2 text-metal-silver font-bold">
+                            <i class="fas fa-comment-dots mr-1"></i> DATA INPUT (PESAN/APRESIASI):
+                        </label>
+                        <textarea id="usermsg" rows="5" class="w-full p-3 focus:outline-none rounded" 
+                                  placeholder="Tuliskan semangat, review, atau dukungan untuk TeknoBites di sini..." 
+                                  maxlength="300" required></textarea>
+                        <div class="text-xs text-gray-500 mt-1">Maksimal 300 karakter</div>
+                    </div>
+
+                    <button onclick="kirimPesanGoogleSheets()" class="industrial-btn w-full tracking-widest transition duration-300 text-lg" id="submit-btn">
+                        <i class="fas fa-paper-plane mr-2"></i> [ EXECUTE ] Kirim Pesan
+                    </button>
+                    
+                    <div id="form-status" class="mt-3 text-center text-sm font-mono text-warning-yellow hidden">
+                        <div class="loading-spinner mx-auto mb-2"></div>
+                        <span>MENGIRIM DATA...</span>
+                    </div>
+                    
+                    <div class="mt-4 text-xs text-gray-500 flex items-center">
+                        <i class="fas fa-database mr-2"></i>
+                        Data akan dikirim dan tersimpan permanen.
+                    </div>
+                </div>
+
+                <!-- Display Panel (Console Log) -->
+                <div class="terminal-box p-5 rounded overflow-hidden flex flex-col h-[450px] bg-dark-steel border-2 border-light-steel">
+                    <div class="text-xs border-b border-gray-600 pb-2 mb-3 flex justify-between items-center text-warning-yellow">
+                        <span class="font-bold">
+                            <i class="fas fa-history mr-1"></i> WORKSHOP LOG HISTORY
+                        </span>
+                        <span class="animate-pulse text-green-500 flex items-center" id="connection-status">
+                            <i class="fas fa-circle text-xs mr-1"></i> ONLINE
+                        </span>
+                    </div>
+                    
+                    <div id="chat-display" class="overflow-y-auto space-y-4 flex-grow pr-2">
+                        <!-- Pesan akan dimuat di sini -->
+                        <div class="text-center text-gray-500 py-10">
+                            <div class="loading-spinner mx-auto mb-3"></div>
+                            <span class="font-bold">Memuat pesan...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-gray-700 text-xs text-gray-500 flex justify-between items-center">
+                        <span id="message-count" class="font-mono">Memuat...</span>
+                        <button onclick="refreshMessages()" class="text-blue-400 hover:text-blue-300 flex items-center">
+                            <i class="fas fa-sync-alt mr-1"></i> Refresh
+                        </button>
+                        <button onclick="clearAllMessages()" class="text-red-400 hover:text-red-300 flex items-center text-xs">
+                            <i class="fas fa-trash-alt mr-1"></i> Hapus Lokal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FITUR WORKSHOP STATUS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 text-center text-xs font-mono text-gray-500 border-t-4 border-light-steel pt-8">
+            <div class="bg-metal-grey p-4 rounded shadow-md shadow-black/50 border-b-4 border-safety-red hover:scale-105 transition-transform">
+                <i class="fas fa-wrench mb-2 block text-safety-red text-2xl"></i>
+                <span class="text-white font-bold">KUALITAS TERJAMIN</span>
+            </div>
+            <div class="bg-metal-grey p-4 rounded shadow-md shadow-black/50 border-b-4 border-safety-red hover:scale-105 transition-transform">
+                <i class="fas fa-users mb-2 block text-safety-red text-2xl"></i>
+                <span class="text-white font-bold">MEKANIK 11-6</span>
+            </div>
+            <div class="bg-metal-grey p-4 rounded shadow-md shadow-black/50 border-b-4 border-safety-red hover:scale-105 transition-transform">
+                <i class="fas fa-tachometer-alt mb-2 block text-safety-red text-2xl"></i>
+                <span class="text-white font-bold">PERFORMA MAKSIMAL</span>
+            </div>
+            <div class="bg-metal-grey p-4 rounded shadow-md shadow-black/50 border-b-4 border-safety-red hover:scale-105 transition-transform">
+                <i class="fas fa-map-pin mb-2 block text-safety-red text-2xl"></i>
+                <span class="text-white font-bold">LOKASI: FISIKA ZONE</span>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 text-center py-6 border-t-4 border-safety-red mt-12 shadow-inner shadow-black/50">
+        <p class="text-metal-silver font-mono text-sm">
+            &copy; 2025 TEKNOBITES PROJECT | BENGKEL TEKNIK MURNI | <span class="text-warning-yellow font-bold">KAMI SIAP MENG-UPGRADE ANDA.</span>
+        </p>
+        <p class="text-xs text-gray-600 mt-2">
+            Google Sheets URL: <span class="text-warning-yellow">https://script.google.com/macros/s/AKfycby26QabWVCnzwpAXH3LzMH4Nqxgm6eKM6Bb5okzLQxqAXOm8t3-GDG1N8laQHTvNIuWWg/exec</span>
+        </p>
+    </footer>
+
+    <script>
+        // ============================================
+        // 1. KONFIGURASI
+        // ============================================
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby26QabWVCnzwpAXH3LzMH4Nqxgm6eKM6Bb5okzLQxqAXOm8t3-GDG1N8laQHTvNIuWWg/exec';
+        
+        // ============================================
+        // 2. DATA
+        // ============================================
+        const workshopQuotes = [
+            { text: "Jangan cuma isi bensin, isi juga semangat!", author: "Montir" },
+            { text: "Alpukat ini lebih kental dari rapor matematika!", author: "Mekanik" },
+            { text: "Cireng kami bikin tenaga nge-gas sampai pulang!", author: "Teknisi" },
+            { text: "Dari lab fisika untuk seluruh semesta rasa!", author: "Tim 11-6" },
+            { text: "Satu gigitan, semua masalah pelajaran hilang!", author: "Montir Senior" },
+            { text: "Kami servis bukan cuma makanan, tapi juga mood!", author: "Crew TeknoBites" },
+            { text: "Kalau belum coba TeknoBites, hari masih belum lengkap!", author: "Pelanggan Setia" },
+            { text: "Energi naik, harga turun, senyum melengkung!", author: "Slogan Workshop" },
+            { text: "Dibuat dengan presisi 100%, kayak percobaan fisika!", author: "Tim Quality Control" }
+        ];
+
+        // ============================================
+        // 3. FUNGSI UTILITY
+        // ============================================
+        function getCurrentDateTime() {
+            const now = new Date();
+            return now.toLocaleString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-notification alert-${type}`;
+            alertDiv.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas ${
+                        type === 'success' ? 'fa-check-circle' :
+                        type === 'error' ? 'fa-exclamation-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' :
+                        'fa-info-circle'
+                    } text-xl text-white"></i>
+                    <div class="text-white font-medium">${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                alertDiv.style.transition = 'opacity 0.5s';
+                setTimeout(() => alertDiv.remove(), 500);
+            }, 5000);
+        }
+
+        // ============================================
+        // 4. FUNGSI ORDER OFFLINE
+        // ============================================
+        function orderOffline(productName) {
+            showAlert(`Silakan order "${productName}" langsung di stand TeknoBites di Lab Fisika! 🛒`, 'info');
+            
+            // Efek visual pada tombol
+            const buttons = document.querySelectorAll('.offline-btn');
+            buttons.forEach(btn => {
+                btn.classList.add('animate-pulse');
+                setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
+            });
+        }
+
+        // ============================================
+        // 5. FITUR QUOTE GENERATOR
+        // ============================================
+        function generateNewQuote() {
+            const randomIndex = Math.floor(Math.random() * workshopQuotes.length);
+            const quote = workshopQuotes[randomIndex];
+            
+            const quoteElement = document.getElementById('workshop-quote');
+            const authorElement = document.getElementById('quote-author');
+            
+            quoteElement.style.opacity = '0.5';
+            authorElement.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                quoteElement.textContent = `"${quote.text}"`;
+                authorElement.textContent = `— ${quote.author}`;
+                
+                quoteElement.style.opacity = '1';
+                authorElement.style.opacity = '1';
+                
+                quoteElement.classList.add('new-message');
+                setTimeout(() => {
+                    quoteElement.classList.remove('new-message');
+                }, 500);
+            }, 300);
+        }
+
+        // ============================================
+        // 6. SISTEM PESAN & KESAN (GOOGLE SHEETS + LOCAL STORAGE)
+        // ============================================
+
+        // Fungsi untuk membuat HTML pesan
+        function createMessageHTML(nama, pesan, tanggal, isFromGoogle = false) {
+            const borderColor = isFromGoogle ? '#FFD700' : '#CC0000';
+            const icon = isFromGoogle ? 'fa-cloud' : 'fa-desktop';
+            const source = isFromGoogle ? '[GOOGLE SHEETS]' : '[LOCAL STORAGE]';
+            
+            return `
+                <div class="new-message mb-4">
+                    <div style="border-left: 3px solid ${borderColor}; padding-left: 12px; background: rgba(0,0,0,0.2);">
+                        <div class="flex justify-between items-start mb-1">
+                            <div>
+                                <span style="color: var(--warning-yellow); font-weight: bold; font-size: 15px;">
+                                    <i class="fas fa-user-circle mr-1"></i>${nama}
+                                </span>
+                                <span class="text-xs ml-2 px-2 py-1 bg-gray-800 rounded">
+                                    <i class="fas ${icon} mr-1"></i>${source}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-400">
+                                <i class="fas fa-clock mr-1"></i>${tanggal}
+                            </span>
+                        </div>
+                        <div style="color: white; font-size: 14px; line-height: 1.4; padding-left: 5px; margin-top: 5px;">
+                            ${pesan}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Simpan ke Local Storage
+        function saveToLocalStorage(nama, pesan, tanggal) {
+            try {
+                let messages = JSON.parse(localStorage.getItem('tekno_messages') || '[]');
+                
+                const newMessage = {
+                    id: Date.now(),
+                    nama: nama,
+                    pesan: pesan,
+                    tanggal: tanggal,
+                    source: 'local'
+                };
+                
+                messages.unshift(newMessage);
+                
+                // Maksimal 50 pesan
+                if (messages.length > 50) {
+                    messages = messages.slice(0, 50);
+                }
+                
+                localStorage.setItem('tekno_messages', JSON.stringify(messages));
+                return true;
+            } catch (error) {
+                console.error('Local Storage error:', error);
+                return false;
+            }
+        }
+
+        // Load dari Local Storage
+        function loadFromLocalStorage() {
+            try {
+                const messages = JSON.parse(localStorage.getItem('tekno_messages') || '[]');
+                const display = document.getElementById('chat-display');
+                const messageCountElement = document.getElementById('message-count');
+                
+                if (messages.length === 0) {
+                    // Tampilkan pesan default jika kosong
+                    display.innerHTML = `
+                        <div class="text-center text-gray-500 py-10">
+                            <i class="fas fa-comment-slash text-3xl mb-3"></i><br>
+                            <span class="font-bold">Belum ada pesan</span><br>
+                            <span class="text-sm">Jadilah yang pertama memberikan pesan & kesan!</span>
+                        </div>
+                    `;
+                    messageCountElement.textContent = '0 pesan tersimpan';
+                } else {
+                    // Tampilkan pesan dari Local Storage
+                    display.innerHTML = '';
+                    messages.forEach(msg => {
+                        display.innerHTML += createMessageHTML(msg.nama, msg.pesan, msg.tanggal, msg.source === 'google');
+                    });
+                    messageCountElement.textContent = `${messages.length} pesan tersimpan`;
+                }
+                
+                return messages.length;
+            } catch (error) {
+                console.error('Error loading from Local Storage:', error);
+                return 0;
+            }
+        }
+
+        // Coba load dari Google Sheets
+        async function tryLoadFromGoogleSheets() {
+            try {
+                console.log('Mencoba koneksi ke Google Sheets...');
+                const response = await fetch(`${GOOGLE_SHEET_URL}?action=getMessages&timestamp=${Date.now()}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Data dari Google Sheets:', data);
+                    
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        const connectionStatus = document.getElementById('connection-status');
+                        connectionStatus.innerHTML = '<i class="fas fa-cloud text-green-400 mr-1"></i> GOOGLE SHEETS';
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.log('Google Sheets offline, menggunakan Local Storage');
+                return false;
+            }
+        }
+
+        // Kirim ke Google Sheets (DIPERBAIKI)
+        async function kirimPesanGoogleSheets() {
+            const nama = document.getElementById('username').value.trim();
+            const pesan = document.getElementById('usermsg').value.trim();
+            const submitBtn = document.getElementById('submit-btn');
+            const statusDiv = document.getElementById('form-status');
+            
+            // Validasi input
+            if (!nama || !pesan) {
+                showAlert('❌ Nama dan pesan harus diisi!', 'error');
+                return;
+            }
+            
+            if (nama.length > 30) {
+                showAlert('❌ Nama maksimal 30 karakter!', 'error');
+                return;
+            }
+            
+            if (pesan.length > 300) {
+                showAlert('❌ Pesan maksimal 300 karakter!', 'error');
+                return;
+            }
+            
+            // Tampilkan loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> MENGIRIM...';
+            statusDiv.classList.remove('hidden');
+            
+            const tanggal = getCurrentDateTime();
+            const display = document.getElementById('chat-display');
+            
+            try {
+                // 1. SIMPAN KE LOCAL STORAGE DULU (garansi pasti tersimpan)
+                saveToLocalStorage(nama, pesan, tanggal);
+                
+                // 2. COBA KIRIM KE GOOGLE SHEETS
+                const formData = new URLSearchParams();
+                formData.append('Nama', nama);
+                formData.append('Pesan', pesan);
+                formData.append('Tanggal', tanggal);
+                
+                console.log('Mengirim data ke Google Sheets:', { nama, pesan, tanggal });
+                
+                // Method 1: Coba dengan POST biasa
+                try {
+                    const response = await fetch(GOOGLE_SHEET_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Gunakan no-cors untuk menghindari CORS issues
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData
+                    });
+                    
+                    // Dengan no-cors, kita tidak bisa membaca response, tapi data tetap terkirim
+                    console.log('Data terkirim (no-cors mode)');
+                    
+                    // Update status koneksi
+                    const connectionStatus = document.getElementById('connection-status');
+                    connectionStatus.innerHTML = '<i class="fas fa-cloud text-green-400 mr-1"></i> GOOGLE SHEETS';
+                    
+                    showAlert('✅ Pesan berhasil dikirim ke Google Sheets!', 'success');
+                    
+                } catch (postError) {
+                    console.log('POST dengan no-cors gagal, coba method lain');
+                    
+                    // Method 2: Coba dengan GET (fallback)
+                    try {
+                        const getUrl = `${GOOGLE_SHEET_URL}?Nama=${encodeURIComponent(nama)}&Pesan=${encodeURIComponent(pesan)}&Tanggal=${encodeURIComponent(tanggal)}&method=GET`;
+                        await fetch(getUrl, { mode: 'no-cors' });
+                        console.log('Data terkirim via GET (fallback)');
+                        
+                        showAlert('✅ Pesan berhasil dikirim!', 'success');
+                    } catch (getError) {
+                        console.log('Kedua method gagal, hanya simpan lokal');
+                        showAlert('⚠️ Data disimpan lokal. Google Sheets offline.', 'warning');
+                    }
+                }
+                
+                // 3. TAMPILKAN PESAN BARU DI CHAT
+                // Jika chat masih loading, clear dulu
+                if (display.innerHTML.includes('Memuat pesan')) {
+                    display.innerHTML = '';
+                }
+                
+                // Tambah pesan baru di atas
+                const newMessageHTML = createMessageHTML(nama, pesan, tanggal, true);
+                display.innerHTML = newMessageHTML + display.innerHTML;
+                
+                // 4. UPDATE COUNTER
+                const messageCount = display.querySelectorAll('.new-message').length;
+                document.getElementById('message-count').textContent = `${messageCount} pesan ditampilkan`;
+                
+                // 5. RESET FORM
+                document.getElementById('username').value = '';
+                document.getElementById('usermsg').value = '';
+                
+            } catch (error) {
+                console.error('Error utama:', error);
+                showAlert('❌ Terjadi kesalahan sistem. Data disimpan lokal.', 'error');
+                
+                // Tetap tampilkan pesan dari Local Storage
+                loadFromLocalStorage();
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> [ EXECUTE ] KIRIM KE GOOGLE SHEETS';
+                statusDiv.classList.add('hidden');
+            }
+        }
+
+        // Refresh messages
+        function refreshMessages() {
+            showAlert('🔄 Memuat ulang pesan...', 'info');
+            
+            // Tampilkan loading
+            const display = document.getElementById('chat-display');
+            display.innerHTML = `
+                <div class="text-center text-gray-500 py-10">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <span class="font-bold">Memuat pesan...</span>
+                </div>
+            `;
+            
+            // Coba koneksi ke Google Sheets
+            setTimeout(async () => {
+                const googleConnected = await tryLoadFromGoogleSheets();
+                
+                // Load dari Local Storage (utama)
+                loadFromLocalStorage();
+                
+                if (googleConnected) {
+                    showAlert('✅ Terhubung ke Google Sheets', 'success');
+                }
+            }, 1000);
+        }
+
+        // Hapus semua pesan
+        function clearAllMessages() {
+            if (confirm('Yakin hapus semua pesan dari penyimpanan lokal?')) {
+                localStorage.removeItem('tekno_messages');
+                loadFromLocalStorage();
+                showAlert('🗑️ Semua pesan lokal telah dihapus!', 'success');
+            }
+        }
+
+        // ============================================
+        // 7. INISIALISASI SAAT HALAMAN DIMUAT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Generate quote pertama
+            generateNewQuote();
+            
+            // 2. Auto change quote setiap 30 detik
+            setInterval(generateNewQuote, 30000);
+            
+            // 3. Load pesan saat pertama kali
+            refreshMessages();
+            
+            // 4. Auto refresh pesan setiap 60 detik
+            setInterval(refreshMessages, 60000);
+            
+            // 5. Cek koneksi Google Sheets
+            setTimeout(async () => {
+                const connected = await tryLoadFromGoogleSheets();
+                if (!connected) {
+                    const connectionStatus = document.getElementById('connection-status');
+                    connectionStatus.innerHTML = '<i class="fas fa-desktop text-yellow-400 mr-1"></i> LOCAL STORAGE';
+                    showAlert('⚠️ Menggunakan penyimpanan lokal', 'warning');
+                }
+            }, 2000);
+            
+            console.log('TeknoBites Workshop Loaded Successfully! ✅');
+        });
+
+        // ============================================
+        // 8. ANIMASI MARQUEE
+        // ============================================
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes marquee {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(-100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

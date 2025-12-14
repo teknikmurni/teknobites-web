@@ -943,9 +943,9 @@ async function loadMessagesFromGoogleSheets() {
                 // Balik urutan agar yang terbaru di atas
                 data.reverse().forEach((row, index) => {
                     if (row.length >= 3) {
-                        const nama = row[0] || 'Anonim';
-                        const pesan = row[1] || '';
-                        const tanggal = row[2] || getCurrentDateTime();
+                        const nama = row[1] || 'Anonim';
+                        const pesan = row[2] || '';
+                        const tanggal = row[3] || getCurrentDateTime();
                         
                         // Tambah kelas animasi untuk pesan baru (5 pesan pertama)
                         const isNew = index < 5;
@@ -1018,8 +1018,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. Load pesan saat pertama kali (dari Google Sheets)
     syncAllMessages();
     
-    // 4. AUTO-REFRESH PESAN SETIAP 10 DETIK (INI YANG PENTING!)
-    setInterval(syncAllMessages, 10000); // Refresh setiap 10 detik
+    // 4. AUTO-REFRESH PESAN SETIAP 30 detik (INI YANG PENTING!)
+    setInterval(syncAllMessages, 30000); // Refresh setiap 60 detik
     
     // 5. Auto refresh pesan setiap 60 detik juga
     setInterval(syncAllMessages, 60000);
@@ -1030,3 +1030,4 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
+

@@ -914,6 +914,119 @@
             }
         `;
         document.head.appendChild(style);
+
+// ============================================
+// 9. AUTO-REFRESH PESAN DARI GOOGLE SHEETS
+// ============================================
+
+// Fungsi untuk mengambil pesan dari Google Sheets
+async function loadMessagesFromGoogleSheets() {
+    try {
+        console.log('Mengambil pesan dari Google Sheets...');
+        const response = await fetch(`${GOOGLE_SHEET_URL}?action=getMessages&timestamp=${Date.now()}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Data diterima dari Google Sheets:', data);
+            
+            if (data && Array.isArray(data) && data.length > 0) {
+                const display = document.getElementById('chat-display');
+                const messageCountElement = document.getElementById('message-count');
+                const connectionStatus = document.getElementById('connection-status');
+                
+                // Update status koneksi
+                connectionStatus.innerHTML = '<i class="fas fa-cloud text-green-400 mr-1"></i> GOOGLE SHEETS LIVE';
+                
+                // Kosongkan display
+                display.innerHTML = '';
+                
+                // Balik urutan agar yang terbaru di atas
+                data.reverse().forEach((row, index) => {
+                    if (row.length >= 3) {
+                        const nama = row[0] || 'Anonim';
+                        const pesan = row[1] || '';
+                        const tanggal = row[2] || getCurrentDateTime();
+                        
+                        // Tambah kelas animasi untuk pesan baru (5 pesan pertama)
+                        const isNew = index < 5;
+                        const messageHTML = `
+                            <div class="${isNew ? 'new-message' : ''} mb-4">
+                                <div style="border-left: 3px solid #FFD700; padding-left: 12px; background: rgba(0,0,0,0.2);">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <div>
+                                            <span style="color: var(--warning-yellow); font-weight: bold; font-size: 15px;">
+                                                <i class="fas fa-user-circle mr-1"></i>${nama}
+                                            </span>
+                                            <span class="text-xs ml-2 px-2 py-1 bg-gray-800 rounded">
+                                                <i class="fas fa-cloud mr-1"></i>[GOOGLE SHEETS]
+                                            </span>
+                                        </div>
+                                        <span class="text-xs text-gray-400">
+                                            <i class="fas fa-clock mr-1"></i>${tanggal}
+                                        </span>
+                                    </div>
+                                    <div style="color: white; font-size: 14px; line-height: 1.4; padding-left: 5px; margin-top: 5px;">
+                                        ${pesan}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        display.innerHTML += messageHTML;
+                    }
+                });
+                
+                // Update counter
+                messageCountElement.textContent = `${data.length} pesan dari Google Sheets`;
+                
+                // Scroll ke atas untuk lihat pesan terbaru
+                display.scrollTop = 0;
+                
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.log('Gagal mengambil dari Google Sheets:', error);
+        return false;
+    }
+}
+
+// Fungsi untuk sinkronisasi Google Sheets + Local Storage
+async function syncAllMessages() {
+    // Coba load dari Google Sheets dulu
+    const googleSuccess = await loadMessagesFromGoogleSheets();
+    
+    // Jika Google Sheets gagal, load dari Local Storage
+    if (!googleSuccess) {
+        loadFromLocalStorage();
+        const connectionStatus = document.getElementById('connection-status');
+        connectionStatus.innerHTML = '<i class="fas fa-desktop text-yellow-400 mr-1"></i> LOCAL STORAGE';
+    }
+}
+
+// ============================================
+// 10. UPDATE INISIALISASI
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Generate quote pertama
+    generateNewQuote();
+    
+    // 2. Auto change quote setiap 30 detik
+    setInterval(generateNewQuote, 30000);
+    
+    // 3. Load pesan saat pertama kali (dari Google Sheets)
+    syncAllMessages();
+    
+    // 4. AUTO-REFRESH PESAN SETIAP 10 DETIK (INI YANG PENTING!)
+    setInterval(syncAllMessages, 10000); // Refresh setiap 10 detik
+    
+    // 5. Auto refresh pesan setiap 60 detik juga
+    setInterval(syncAllMessages, 60000);
+    
+    console.log('TeknoBites Workshop dengan Auto-Refresh Loaded! ✅');
+});
+        
     </script>
 </body>
 </html>

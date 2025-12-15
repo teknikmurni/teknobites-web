@@ -745,8 +745,8 @@
                         
                         if (row.length >= 3) {
                             // PERCOBAAN 1: A=Nama, B=Pesan, C=Tanggal
-                            nama = row[2] || 'Anonim';
-                            pesan = row[1] || '';
+                            nama = row[1] || 'Anonim';
+                            pesan = row[2] || '';
                             tanggal = row[0] || getCurrentDateTime();
                             
                             // PERCOBAAN 2: Jika masih salah, coba balik
@@ -886,6 +886,7 @@
     </script>
 </body>
 </html>
+
 
 
 

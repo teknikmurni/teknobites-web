@@ -293,7 +293,7 @@
                         <div class="text-2xl md:text-3xl font-bold text-warning-yellow">Rp 7.000</div>
                     </div>
                     <button class="offline-btn w-full sm:w-auto flex items-center justify-center gap-2" 
-                            onclick="orderOffline('ALPUKAT LIQUID COOLANT')">
+                            onclick="orderOffline(Avotoque)">
                         <i class="fas fa-store"></i>
                         <span>ORDER OFFLINE DI STAND</span>
                     </button>
@@ -332,7 +332,7 @@
                         <div class="text-2xl md:text-3xl font-bold text-warning-yellow">Rp 8.000</div>
                     </div>
                     <button class="offline-btn w-full sm:w-auto flex items-center justify-center gap-2"
-                            onclick="orderOffline('COOKIES & ICE CREAM UPGRADE KIT')">
+                            onclick="orderOffline('Frozzenut')">
                         <i class="fas fa-store"></i>
                         <span>ORDER OFFLINE DI STAND</span>
                     </button>
@@ -374,7 +374,7 @@
                         <div class="text-2xl md:text-3xl font-bold text-warning-yellow">Rp 8.000</div>
                     </div>
                     <button class="offline-btn w-full sm:w-auto flex items-center justify-center gap-2"
-                            onclick="orderOffline('CIRENG REACTOR FUEL CELL')">
+                            onclick="orderOffline('Cheezygear')">
                         <i class="fas fa-store"></i>
                         <span>ORDER OFFLINE DI STAND</span>
                     </button>
@@ -525,7 +525,9 @@
         { text: "Kami servis bukan cuma makanan, tapi juga mood!", author: "Crew TeknoBites" },
         { text: "Kalau belum coba TeknoBites, hari masih belum lengkap!", author: "Pelanggan Setia" },
         { text: "Energi naik, harga turun, senyum melengkung!", author: "Slogan Workshop" },
-        { text: "Dibuat dengan presisi 100%, kayak percobaan fisika!", author: "Tim Quality Control" }
+        { text: "Dibuat dengan presisi 100%, kayak percobaan fisika!", author: "Tim Quality Control" 
+        { text: "F=W/S 'Kecilkan gaya perbesar usaha'", author: "Crew TeknoBites" },
+        { text: "F aksi= F reaksi Kalian beli kita happy, author: "Tim 11-6" },
     ];
 
     // ============================================
@@ -743,14 +745,14 @@
                         
                         if (row.length >= 3) {
                             // PERCOBAAN 1: A=Nama, B=Pesan, C=Tanggal
-                            nama = row[0] || 'Anonim';
+                            nama = row[2] || 'Anonim';
                             pesan = row[1] || '';
-                            tanggal = row[2] || getCurrentDateTime();
+                            tanggal = row[0] || getCurrentDateTime();
                             
                             // PERCOBAAN 2: Jika masih salah, coba balik
-                            // nama = row[2] || 'Anonim';    // Kolom C jadi Nama
-                            // pesan = row[0] || '';         // Kolom A jadi Pesan
-                            // tanggal = row[1] || getCurrentDateTime(); // Kolom B jadi Tanggal
+                            // nama = row[0] || 'Anonim';    // Kolom C jadi Nama
+                            // pesan = row[1] || '';         // Kolom A jadi Pesan
+                            // tanggal = row[2] || getCurrentDateTime(); // Kolom B jadi Tanggal
                             
                             // PERCOBAAN 3: Jika masih salah lagi
                             // nama = row[1] || 'Anonim';    // Kolom B jadi Nama
@@ -884,6 +886,7 @@
     </script>
 </body>
 </html>
+
 
 
 

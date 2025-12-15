@@ -745,19 +745,19 @@
                         
                         if (row.length >= 3) {
                             // PERCOBAAN 1: A=Nama, B=Pesan, C=Tanggal
-                            nama = row[1] || 'Anonim';
-                            pesan = row[2] || '';
-                            tanggal = row[0] || getCurrentDateTime();
+                            nama = row[0] || 'Anonim';
+                            pesan = row[1] || '';
+                            tanggal = row[2] || getCurrentDateTime();
                             
                             // PERCOBAAN 2: Jika masih salah, coba balik
-                            // nama = row[0] || 'Anonim';    // Kolom C jadi Nama
+                            // nama = row[2] || 'Anonim';    // Kolom B jadi Nama
                             // pesan = row[1] || '';         // Kolom A jadi Pesan
-                            // tanggal = row[2] || getCurrentDateTime(); // Kolom B jadi Tanggal
+                            // tanggal = row[0] || getCurrentDateTime(); // Kolom B jadi Tanggal
                             
                             // PERCOBAAN 3: Jika masih salah lagi
                             // nama = row[1] || 'Anonim';    // Kolom B jadi Nama
                             // pesan = row[2] || '';         // Kolom C jadi Pesan  
-                            // tanggal = row[0] || getCurrentDateTime(); // Kolom A jadi Tanggal
+                            // tanggal = row[0] || getCurrentDateTime(); // Kolom B jadi Tanggal
                             
                             console.log(`  Parsed: Nama="${nama.substring(0,10)}", Pesan="${pesan.substring(0,20)}...", Tanggal="${tanggal}"`);
                         }
@@ -886,6 +886,15 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 
